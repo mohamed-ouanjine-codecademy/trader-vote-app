@@ -4,6 +4,7 @@ import TraderList from './pages/TraderList';
 import TraderDetail from './pages/TraderDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/trader/:id" element={<TraderDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

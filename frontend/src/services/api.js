@@ -1,7 +1,7 @@
 // frontend/src/services/api.js
 import axios from 'axios';
 
-const API_BASE = 'https://trader-vote-app.onrender.com';
+const API_BASE = process.env.REACT_APP_API_URL;
 
 export const fetchTraders = async () => {
   const response = await axios.get(`${API_BASE}/traders`);
@@ -19,6 +19,10 @@ export const submitVote = async (traderId, formData) => {
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  const response = await axios.post(`${API_BASE}/traders/${traderId}/vote`, formData, { headers });
+  const response = await axios.post(
+    `${API_BASE}/traders/${traderId}/vote`,
+    formData,
+    { headers }
+  );
   return response.data;
 };

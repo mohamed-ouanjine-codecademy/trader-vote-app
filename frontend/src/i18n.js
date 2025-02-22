@@ -1,3 +1,4 @@
+// frontend/src/i18n.js
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -26,7 +27,12 @@ const resources = {
       "password": "Password",
       "logout": "Logout",
       "traderVoteApp": "Trader Vote App",
-      "googleSignIn": "Sign in with Google"
+      "googleSignIn": "Sign in with Google",
+      "profile": "Profile",
+      "myVotes": "My Votes",
+      "noVotes": "You haven't voted on any trader yet.",
+      "myComments": "My Comments",
+      "noComments": "You haven't posted any comments yet."
     }
   },
   fr: {

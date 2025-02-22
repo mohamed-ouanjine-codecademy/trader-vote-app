@@ -6,6 +6,7 @@ const voteController = require('../controllers/voteController');
 const commentController = require('../controllers/commentController');
 const multer = require('multer');
 const auth = require('../middleware/auth');
+const optionalAuth = require('../middleware/optionalAuth');
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
@@ -23,8 +24,8 @@ router.get('/', traderController.getTraders);
 router.get('/:id', traderController.getTraderById);
 router.post('/:id/vote', auth, upload.array('evidence', 5), voteController.submitVote);
 
-// Comment routes
+// Comment routes (using optionalAuth so both logged-in and anonymous users can post)
 router.get('/:id/comments', commentController.getComments);
-router.post('/:id/comments', commentController.postComment);
+router.post('/:id/comments', optionalAuth, commentController.postComment);
 
 module.exports = router;

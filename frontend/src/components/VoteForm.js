@@ -1,3 +1,4 @@
+// frontend/src/components/VoteForm.js
 import React, { useState } from 'react';
 import { submitVote } from '../services/api';
 import { Button, RadioGroup, FormControlLabel, Radio, Box } from '@mui/material';
@@ -21,20 +22,22 @@ const VoteForm = ({ traderId, onVoteSubmitted }) => {
     }
     try {
       await submitVote(traderId, formData);
-      onVoteSubmitted();
+      onVoteSubmitted(); // Refresh trader details
     } catch (error) {
       console.error(t('error'), error);
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
       <RadioGroup row value={vote} onChange={(e) => setVote(e.target.value)}>
         <FormControlLabel value="scammer" control={<Radio />} label={t('scammer')} />
         <FormControlLabel value="legit" control={<Radio />} label={t('legit')} />
       </RadioGroup>
-      <input type="file" multiple onChange={handleFileChange} />
-      <Button variant="contained" type="submit" sx={{ mt: 2 }}>
+      <Box sx={{ mt: 2 }}>
+        <input type="file" multiple onChange={handleFileChange} />
+      </Box>
+      <Button variant="contained" type="submit" fullWidth sx={{ mt: 2, py: 1.5 }}>
         {t('submitVote')}
       </Button>
     </Box>

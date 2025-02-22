@@ -1,3 +1,4 @@
+// frontend/src/pages/TraderList.js
 import React, { useEffect, useState } from 'react';
 import { fetchTraders } from '../services/api';
 import { Link } from 'react-router-dom';
@@ -17,32 +18,43 @@ const TraderList = () => {
         console.error(t('error'), error);
       }
     };
-
     getTraders();
   }, [t]);
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
+    <Container sx={{ py: 4 }}>
+      <Typography variant="h4" align="center" gutterBottom>
         {t('traders')}
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {traders.map((trader) => (
           <Grid item xs={12} sm={6} md={4} key={trader._id}>
-            <Card>
+            <Card
+              sx={{
+                maxWidth: 345,
+                margin: 'auto',
+                borderRadius: 2,
+                boxShadow: 3,
+                transition: 'transform 0.3s',
+                '&:hover': { transform: 'scale(1.03)' },
+              }}
+            >
               {trader.images && trader.images.length > 0 && (
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="180"
                   image={trader.images[0]}
                   alt={trader.name}
                 />
               )}
               <CardContent>
-                <Typography variant="h6">
-                  <Link to={`/trader/${trader._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    {trader.name}
-                  </Link>
+                <Typography
+                  variant="h6"
+                  component={Link}
+                  to={`/trader/${trader._id}`}
+                  sx={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  {trader.name}
                 </Typography>
                 {trader.socialMedia && (
                   <Typography variant="body2" color="textSecondary">
