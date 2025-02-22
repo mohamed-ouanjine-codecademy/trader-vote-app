@@ -27,7 +27,7 @@ const TraderList = () => {
         {t('traders')}
       </Typography>
       <Grid container spacing={3}>
-        {/* {traders.map((trader) => ( */}
+        {traders.map((trader) => (
           <Grid item xs={12} sm={6} md={4} key={trader._id}>
             <Card
               sx={{
