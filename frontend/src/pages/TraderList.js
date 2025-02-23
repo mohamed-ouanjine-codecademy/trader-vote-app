@@ -6,8 +6,9 @@ import { Container, Typography, Card, CardContent, CardMedia, Grid } from '@mui/
 import { useTranslation } from 'react-i18next';
 
 const TraderList = () => {
-  const { t } = useTranslation();
-  const [traderList, setTraderList] = useState([]); // renamed state variable
+  // Rename "t" to "translate" to avoid conflicts after minification
+  const { t: translate } = useTranslation();
+  const [traderList, setTraderList] = useState([]);
 
   useEffect(() => {
     const getTraders = async () => {
@@ -15,19 +16,19 @@ const TraderList = () => {
         const data = await fetchTraders();
         setTraderList(data);
       } catch (error) {
-        console.error(t('error'), error);
+        console.error(translate('error'), error);
       }
     };
     getTraders();
-  }, []); // removed "t" from dependency array
+  }, []); // no dependency on translate
 
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" align="center" gutterBottom>
-        {t('traders')}
+        {translate('traders')}
       </Typography>
       <Grid container spacing={3}>
-        {traderList.map((trader) => ( // use the new variable name
+        {traderList.map((trader) => (
           <Grid item xs={12} sm={6} md={4} key={trader._id}>
             <Card
               sx={{
@@ -58,7 +59,7 @@ const TraderList = () => {
                 </Typography>
                 {trader.socialMedia && (
                   <Typography variant="body2" color="textSecondary">
-                    {t('socialMedia', { socialMedia: trader.socialMedia })}
+                    {translate('socialMedia', { socialMedia: trader.socialMedia })}
                   </Typography>
                 )}
               </CardContent>
