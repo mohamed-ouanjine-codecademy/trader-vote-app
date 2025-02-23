@@ -17,9 +17,11 @@ exports.postComment = async (req, res) => {
     }
     const newComment = new Comment(commentData);
     await newComment.save();
-    // Emit real‑time update event for comments
+    
+    // Emit a real-time update to clients in the room for this trader
     const io = req.app.get('io');
-    io.emit('commentUpdate', { traderId: req.params.id });
+    io.to(req.params.id.toString()).emit('commentUpdate', { traderId: req.params.id });
+    
     res.status(201).json(newComment);
   } catch (error) {
     res.status(500).json({ error: error.message });

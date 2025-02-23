@@ -13,6 +13,7 @@ import {
 import VoteForm from '../components/VoteForm';
 import CommentsSection from '../components/CommentsSection';
 import { useTranslation } from 'react-i18next';
+import { io } from 'socket.io-client';
 
 const TraderDetail = () => {
   const { t } = useTranslation();
@@ -30,6 +31,26 @@ const TraderDetail = () => {
 
   useEffect(() => {
     loadTrader();
+  }, [id]);
+
+  // Set up Socket.IO connection and join a room for real-time updates
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_API_URL);
+    socket.emit('joinRoom', id); // join room corresponding to trader id
+    
+    socket.on('commentUpdate', (data) => {
+      if (data.traderId === id) {
+        loadTrader();
+      }
+    });
+    socket.on('voteUpdate', (data) => {
+      if (data.traderId === id) {
+        loadTrader();
+      }
+    });
+    return () => {
+      socket.disconnect();
+    };
   }, [id]);
 
   if (!traderData) {

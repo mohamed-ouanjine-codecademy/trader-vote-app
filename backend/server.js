@@ -7,7 +7,7 @@ const path = require('path');
 const http = require('http');
 const passport = require('passport');
 
-// Load Passport configuration (which includes the Google strategy)
+// Load Passport configuration (includes Google strategy)
 require('./config/passport');
 
 const app = express();
@@ -40,6 +40,21 @@ const io = new Server(server, {
 });
 app.set('io', io);
 
+// Listen for socket connections and allow joining rooms
+io.on('connection', (socket) => {
+  console.log('Client connected: ' + socket.id);
+  
+  // Listen for joinRoom event
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log(`Socket ${socket.id} joined room ${room}`);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('Client disconnected: ' + socket.id);
+  });
+});
+
 // Register routes
 const traderRoutes = require('./routes/traderRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -48,14 +63,6 @@ const profileRoutes = require('./routes/profileRoutes');
 app.use('/traders', traderRoutes);
 app.use('/auth', authRoutes);
 app.use('/auth/profile', profileRoutes);
-
-// Listen for socket connections
-io.on('connection', (socket) => {
-  console.log('Client connected: ' + socket.id);
-  socket.on('disconnect', () => {
-    console.log('Client disconnected: ' + socket.id);
-  });
-});
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
