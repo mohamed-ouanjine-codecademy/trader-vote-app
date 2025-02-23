@@ -1,7 +1,7 @@
 // frontend/src/components/VoteForm.js
 import React, { useState } from 'react';
+import { Button, RadioGroup, FormControlLabel, Radio, Box, Typography } from '@mui/material';
 import { submitVote } from '../services/api';
-import { Button, RadioGroup, FormControlLabel, Radio, Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 const VoteForm = ({ traderId, onVoteSubmitted }) => {
@@ -29,15 +29,18 @@ const VoteForm = ({ traderId, onVoteSubmitted }) => {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      <RadioGroup row value={vote} onChange={(e) => setVote(e.target.value)}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Typography variant="h6" sx={{ mb: 1 }}>
+        {t('submitVote')}
+      </Typography>
+      <RadioGroup row value={vote} onChange={(e) => setVote(e.target.value)} sx={{ mb: 2 }}>
         <FormControlLabel value="scammer" control={<Radio />} label={t('scammer')} />
         <FormControlLabel value="legit" control={<Radio />} label={t('legit')} />
       </RadioGroup>
-      <Box sx={{ mt: 2 }}>
-        <input type="file" multiple onChange={handleFileChange} />
+      <Box sx={{ mb: 2 }}>
+        <input type="file" multiple onChange={handleFileChange} style={{ width: '100%' }} />
       </Box>
-      <Button variant="contained" type="submit" fullWidth sx={{ mt: 2, py: 1.5 }}>
+      <Button variant="contained" type="submit" fullWidth sx={{ py: 1.5 }}>
         {t('submitVote')}
       </Button>
     </Box>

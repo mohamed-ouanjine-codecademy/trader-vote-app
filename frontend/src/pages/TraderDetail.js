@@ -6,7 +6,6 @@ import {
   Container,
   Typography,
   Divider,
-  Grid,
   Box,
   Card,
   CardMedia,
@@ -14,7 +13,6 @@ import {
 import VoteForm from '../components/VoteForm';
 import CommentsSection from '../components/CommentsSection';
 import { useTranslation } from 'react-i18next';
-import { io } from 'socket.io-client';
 
 const TraderDetail = () => {
   const { t } = useTranslation();
@@ -32,29 +30,11 @@ const TraderDetail = () => {
 
   useEffect(() => {
     loadTrader();
-  }, [id, t]);
-
-  // Set up Socket.IO connection for real-time updates
-  useEffect(() => {
-    const socket = io(process.env.REACT_APP_API_URL);
-    socket.on('voteUpdate', (data) => {
-      if (data.traderId === id) {
-        loadTrader();
-      }
-    });
-    socket.on('commentUpdate', (data) => {
-      if (data.traderId === id) {
-        loadTrader();
-      }
-    });
-    return () => {
-      socket.disconnect();
-    };
   }, [id]);
 
   if (!traderData) {
     return (
-      <Container sx={{ py: 4 }}>
+      <Container sx={{ py: 6 }}>
         <Typography variant="h6" align="center">
           {t('loading')}
         </Typography>
@@ -62,22 +42,24 @@ const TraderDetail = () => {
     );
   }
 
-  const { trader, votes } = traderData;
-  const scamVotes = votes.filter((v) => v.vote === 'scammer').length;
-  const legitVotes = votes.filter((v) => v.vote === 'legit').length;
+  const { trader, voteSummary } = traderData;
+  const totalVotes = voteSummary ? voteSummary.scammer + voteSummary.legit : 0;
+  const scammerPct = totalVotes > 0 ? Math.round((voteSummary.scammer / totalVotes) * 100) : 0;
+  const legitPct = totalVotes > 0 ? 100 - scammerPct : 0;
 
   return (
-    <Container sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom align="center">
+    <Container sx={{ py: 6 }}>
+      <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
         {trader.name}
       </Typography>
       {trader.images && trader.images.length > 0 && (
-        <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
-          <Card sx={{ maxWidth: 600, width: '100%', borderRadius: 2, boxShadow: 3 }}>
+        <Box display="flex" justifyContent="center" sx={{ mb: 4 }}>
+          <Card sx={{ maxWidth: 700, borderRadius: 3, boxShadow: 6 }}>
             <CardMedia
               component="img"
               image={trader.images[0]}
               alt={trader.name}
+              sx={{ height: { xs: 250, md: 400 } }}
             />
           </Card>
         </Box>
@@ -88,37 +70,40 @@ const TraderDetail = () => {
         </Typography>
       )}
       <Divider sx={{ my: 3 }} />
-      <Typography variant="h6" gutterBottom>
-        {t('votes')}
-      </Typography>
-      <Typography variant="body1">
-        {t('scammerVotes', { count: scamVotes })}
-      </Typography>
-      <Typography variant="body1">
-        {t('legitVotes', { count: legitVotes })}
-      </Typography>
-      <Divider sx={{ my: 3 }} />
-      <Typography variant="h6" gutterBottom>
-        {t('submitVote')}
-      </Typography>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          {t('votes')}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          {`Scammer: ${scammerPct}% | Legit: ${legitPct}%`}
+        </Typography>
+        <Box
+          sx={{
+            height: 10,
+            width: '100%',
+            borderRadius: 5,
+            backgroundColor: '#e0e0e0',
+            display: 'flex',
+            overflow: 'hidden',
+          }}
+        >
+          <Box
+            sx={{
+              height: '100%',
+              width: `${scammerPct}%`,
+              backgroundColor: '#f44336',
+            }}
+          />
+          <Box
+            sx={{
+              height: '100%',
+              width: `${legitPct}%`,
+              backgroundColor: '#2196f3',
+            }}
+          />
+        </Box>
+      </Box>
       <VoteForm traderId={trader._id} onVoteSubmitted={loadTrader} />
-      <Divider sx={{ my: 3 }} />
-      <Typography variant="h6" gutterBottom>
-        {t('evidenceSubmitted')}
-      </Typography>
-      <Grid container spacing={2}>
-        {votes.map((vote) =>
-          vote.evidence.map((imgPath, index) => (
-            <Grid item xs={12} sm={6} md={4} key={`${vote._id}-${index}`}>
-              <img
-                src={`${process.env.REACT_APP_API_URL}/${imgPath}`}
-                alt="Evidence"
-                style={{ width: '100%', borderRadius: '4px' }}
-              />
-            </Grid>
-          ))
-        )}
-      </Grid>
       <Divider sx={{ my: 3 }} />
       <CommentsSection traderId={trader._id} />
     </Container>

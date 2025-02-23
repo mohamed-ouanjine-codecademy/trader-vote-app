@@ -27,13 +27,13 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ background: 'linear-gradient(90deg, #0D47A1, #1976D2)' }}>
       <Toolbar>
         <Typography
           variant="h6"
           component={Link}
           to="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}
         >
           {t('traderVoteApp')}
         </Typography>
@@ -74,4 +74,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

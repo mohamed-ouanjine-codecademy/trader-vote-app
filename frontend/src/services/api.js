@@ -16,13 +16,7 @@ export const fetchTraderById = async (id) => {
 export const submitVote = async (traderId, formData) => {
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'multipart/form-data' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  const response = await axios.post(
-    `${API_BASE}/traders/${traderId}/vote`,
-    formData,
-    { headers }
-  );
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const response = await axios.post(`${API_BASE}/traders/${traderId}/vote`, formData, { headers });
   return response.data;
 };

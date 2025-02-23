@@ -21,9 +21,7 @@ const CommentsSection = ({ traderId }) => {
 
   const fetchComments = async () => {
     try {
-      const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/traders/${traderId}/comments`
-      );
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/traders/${traderId}/comments`);
       setComments(res.data);
     } catch (error) {
       console.error('Error fetching comments:', error);
@@ -37,19 +35,11 @@ const CommentsSection = ({ traderId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Get token if available
       const token = localStorage.getItem('token');
       await axios.post(
         `${process.env.REACT_APP_API_URL}/traders/${traderId}/comments`,
-        {
-          text: commentText,
-          name: commentName,
-        },
-        token && {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { text: commentText, name: commentName },
+        token && { headers: { Authorization: `Bearer ${token}` } }
       );
       setCommentText('');
       setCommentName('');

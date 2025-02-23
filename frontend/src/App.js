@@ -1,3 +1,4 @@
+// frontend/src/App.js
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TraderList from './pages/TraderList';
@@ -12,6 +13,7 @@ function App() {
   const { i18n } = useTranslation();
 
   useEffect(() => {
+    // Set text direction for RTL languages
     document.body.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
   }, [i18n.language]);
 
