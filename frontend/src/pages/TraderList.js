@@ -7,20 +7,19 @@ import { useTranslation } from 'react-i18next';
 
 const TraderList = () => {
   const { t } = useTranslation();
-  const [traders, setTraders] = useState([]);
+  const [traderList, setTraderList] = useState([]); // renamed state variable
 
   useEffect(() => {
     const getTraders = async () => {
       try {
         const data = await fetchTraders();
-        setTraders(data);
+        setTraderList(data);
       } catch (error) {
         console.error(t('error'), error);
       }
     };
     getTraders();
-    // Removed t from dependency array to avoid issues in production
-  }, []);
+  }, []); // removed "t" from dependency array
 
   return (
     <Container sx={{ py: 4 }}>
@@ -28,7 +27,7 @@ const TraderList = () => {
         {t('traders')}
       </Typography>
       <Grid container spacing={3}>
-        {traders.map((trader) => (
+        {traderList.map((trader) => ( // use the new variable name
           <Grid item xs={12} sm={6} md={4} key={trader._id}>
             <Card
               sx={{
