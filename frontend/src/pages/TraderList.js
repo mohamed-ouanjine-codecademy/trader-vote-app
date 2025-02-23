@@ -19,7 +19,8 @@ const TraderList = () => {
       }
     };
     getTraders();
-  }, [t]);
+    // Removed t from dependency array to avoid issues in production
+  }, []);
 
   return (
     <Container sx={{ py: 4 }}>
