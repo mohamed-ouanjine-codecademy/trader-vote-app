@@ -15,10 +15,8 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get('/google/callback', 
   passport.authenticate('google', { session: false }), 
   (req, res) => {
-    // Generate JWT for the authenticated user
     const payload = { userId: req.user._id };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
-    // Redirect back to the frontend with the token as a query parameter
     res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
   }
 );

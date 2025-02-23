@@ -9,4 +9,7 @@ const VoteSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// Ensure that each user can vote only once per trader.
+VoteSchema.index({ trader: 1, user: 1 }, { unique: true });
+
 module.exports = mongoose.model('Vote', VoteSchema);

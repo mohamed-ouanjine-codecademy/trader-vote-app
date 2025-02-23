@@ -9,10 +9,9 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.GOOGLE_CALLBACK_URL,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    // Check if the user already exists based on their Google profile ID
+    // Find an existing user or create a new one
     let user = await User.findOne({ googleId: profile.id });
     if (!user) {
-      // If not, create a new user
       user = new User({
         googleId: profile.id,
         displayName: profile.displayName,

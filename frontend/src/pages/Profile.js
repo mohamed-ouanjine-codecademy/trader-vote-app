@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 const Profile = () => {
   const { t } = useTranslation();
   const [profileData, setProfileData] = useState(null);
+  const [error, setError] = useState('');
 
   const fetchProfile = async () => {
     try {
@@ -15,8 +16,9 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfileData(res.data);
-    } catch (error) {
-      console.error(t('error'), error);
+    } catch (err) {
+      console.error(t('error'), err);
+      setError(err.response?.data?.error || err.message);
     }
   };
 
@@ -24,10 +26,22 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+  if (error) {
+    return (
+      <Container sx={{ py: 4 }}>
+        <Typography variant="h6" align="center" color="error">
+          {error}
+        </Typography>
+      </Container>
+    );
+  }
+
   if (!profileData) {
     return (
       <Container sx={{ py: 4 }}>
-        <Typography variant="h6" align="center">{t('loading')}</Typography>
+        <Typography variant="h6" align="center">
+          {t('loading')}
+        </Typography>
       </Container>
     );
   }
@@ -42,7 +56,7 @@ const Profile = () => {
       <Card sx={{ mb: 4, borderRadius: 3, boxShadow: 6 }}>
         <CardContent>
           <Typography variant="h6">
-            {t('username')}: {user.username || user.displayName}
+            {t('username')}: {user.username || user.displayName || 'Google User'}
           </Typography>
         </CardContent>
       </Card>
@@ -68,10 +82,7 @@ const Profile = () => {
           <List>
             {comments.map(comment => (
               <ListItem key={comment._id}>
-                <ListItemText
-                  primary={`${comment.trader ? comment.trader.name : 'Unknown Trader'}: ${comment.text}`}
-                  secondary={new Date(comment.createdAt).toLocaleString()}
-                />
+                <ListItemText primary={`${comment.trader ? comment.trader.name : 'Unknown Trader'}: ${comment.text}`} secondary={new Date(comment.createdAt).toLocaleString()} />
               </ListItem>
             ))}
           </List>
