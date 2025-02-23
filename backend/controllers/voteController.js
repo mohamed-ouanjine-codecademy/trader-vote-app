@@ -28,8 +28,11 @@ exports.submitVote = async (req, res) => {
     await newVote.save();
 
     // Emit real-time update event for votes (if using Socket.IO)
+    // backend/controllers/voteController.js
     const io = req.app.get('io');
     io.to(req.params.id.toString()).emit('voteUpdate', { traderId: req.params.id });
+    io.emit('globalUpdate', { traderId: req.params.id });  // Global update event
+
 
 
     res.status(201).json({ message: 'Vote recorded', vote: newVote });

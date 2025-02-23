@@ -12,26 +12,40 @@ import {
   Box,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { io } from 'socket.io-client';
 
 const TraderList = () => {
   const { t } = useTranslation();
   const [traderList, setTraderList] = useState([]);
 
-  useEffect(() => {
-    const getTraders = async () => {
-      try {
-        const data = await fetchTraders();
-        if (Array.isArray(data)) {
-          setTraderList(data);
-        } else {
-          console.error("Expected an array but got:", data);
-          setTraderList([]);
-        }
-      } catch (error) {
-        console.error(t('error'), error);
+  const loadTraders = async () => {
+    try {
+      const data = await fetchTraders();
+      if (Array.isArray(data)) {
+        setTraderList(data);
+      } else {
+        console.error("Expected an array but got:", data);
+        setTraderList([]);
       }
+    } catch (error) {
+      console.error(t('error'), error);
+    }
+  };
+
+  useEffect(() => {
+    loadTraders();
+  }, []);
+
+  // Create a persistent socket connection to listen for global updates
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_API_URL);
+    socket.on('globalUpdate', (data) => {
+      console.log('Global update received:', data);
+      loadTraders();
+    });
+    return () => {
+      socket.disconnect();
     };
-    getTraders();
   }, []);
 
   return (
@@ -66,12 +80,7 @@ const TraderList = () => {
                     variant="h5"
                     component={Link}
                     to={`/trader/${trader._id}`}
-                    sx={{
-                      textDecoration: 'none',
-                      color: 'inherit',
-                      fontWeight: 'bold',
-                      mb: 1,
-                    }}
+                    sx={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold', mb: 1 }}
                   >
                     {trader.name}
                   </Typography>
