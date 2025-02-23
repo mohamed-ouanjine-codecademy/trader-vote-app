@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { io } from 'socket.io-client';
 
 const CommentsSection = ({ traderId }) => {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ const CommentsSection = ({ traderId }) => {
   const [commentText, setCommentText] = useState('');
   const [commentName, setCommentName] = useState('');
 
+  // Function to fetch comments from the backend
   const fetchComments = async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/traders/${traderId}/comments`);
@@ -29,9 +31,28 @@ const CommentsSection = ({ traderId }) => {
   };
 
   useEffect(() => {
+    // Initially load comments
     fetchComments();
+
+    // Initialize Socket.IO connection and join the trader's room
+    const socket = io(process.env.REACT_APP_API_URL);
+    socket.emit('joinRoom', traderId);
+    console.log(`Joined room: ${traderId}`);
+
+    // Listen for comment updates
+    socket.on('commentUpdate', (data) => {
+      console.log('Received commentUpdate event:', data);
+      if (data.traderId === traderId) {
+        fetchComments();
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [traderId]);
 
+  // Handle form submission to post a new comment
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -39,10 +60,11 @@ const CommentsSection = ({ traderId }) => {
       await axios.post(
         `${process.env.REACT_APP_API_URL}/traders/${traderId}/comments`,
         { text: commentText, name: commentName },
-        token && { headers: { Authorization: `Bearer ${token}` } }
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
       );
       setCommentText('');
       setCommentName('');
+      // Optionally fetch comments immediately (updates should also come via socket)
       fetchComments();
     } catch (error) {
       console.error('Error posting comment:', error);

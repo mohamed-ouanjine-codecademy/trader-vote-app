@@ -12,25 +12,26 @@ exports.submitVote = async (req, res) => {
     if (existingVote) {
       return res.status(400).json({ error: "You have already voted for this trader" });
     }
-    
+
     let evidenceFiles = [];
     if (req.files) {
       evidenceFiles = req.files.map(file => file.path);
     }
-    
+
     const newVote = new Vote({
       trader: req.params.id,
       vote,
       evidence: evidenceFiles,
       user: req.user.userId,
     });
-    
+
     await newVote.save();
 
     // Emit real-time update event for votes (if using Socket.IO)
     const io = req.app.get('io');
-    io.emit('voteUpdate', { traderId: req.params.id });
-    
+    io.to(req.params.id.toString()).emit('voteUpdate', { traderId: req.params.id });
+
+
     res.status(201).json({ message: 'Vote recorded', vote: newVote });
   } catch (error) {
     // Check for duplicate key error in case the unique index fires
