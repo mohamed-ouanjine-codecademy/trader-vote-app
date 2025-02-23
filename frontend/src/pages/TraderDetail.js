@@ -1,5 +1,5 @@
 // frontend/src/pages/TraderDetail.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchTraderById } from '../services/api';
 import {
@@ -19,6 +19,7 @@ const TraderDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams();
   const [traderData, setTraderData] = useState(null);
+  const socketRef = useRef(null);
 
   const loadTrader = async () => {
     try {
@@ -31,23 +32,34 @@ const TraderDetail = () => {
 
   useEffect(() => {
     loadTrader();
-  }, [id]);
+  }, [id, t]);
 
-  // Set up Socket.IO connection and join a room for real-time updates
+  // Set up a single Socket.IO connection when the component mounts
   useEffect(() => {
+    // Connect using the API URL from environment variables
     const socket = io(process.env.REACT_APP_API_URL);
-    socket.emit('joinRoom', id); // join room corresponding to trader id
+    socketRef.current = socket;
     
+    // Join room for this trader
+    socket.emit('joinRoom', id);
+    console.log('Joined room:', id);
+
+    // Listen for comment updates
     socket.on('commentUpdate', (data) => {
+      console.log('Received commentUpdate event:', data);
       if (data.traderId === id) {
         loadTrader();
       }
     });
+
+    // Listen for vote updates
     socket.on('voteUpdate', (data) => {
+      console.log('Received voteUpdate event:', data);
       if (data.traderId === id) {
         loadTrader();
       }
     });
+
     return () => {
       socket.disconnect();
     };
