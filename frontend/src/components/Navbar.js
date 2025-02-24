@@ -1,19 +1,18 @@
 // frontend/src/components/Navbar.js
-import React from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem } from '@mui/material';
+import React, { useContext } from 'react';
+import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Switch } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import MenuIcon from '@mui/icons-material/Menu';
+import { AuthContext } from '../context/AuthContext';
 
-const Navbar = () => {
+const Navbar = ({ toggleMode, mode }) => {
   const { t, i18n } = useTranslation();
-  const token = localStorage.getItem('token');
+  const { token, setToken } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const [langAnchor, setLangAnchor] = React.useState(null);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    setToken(null);
     navigate('/');
   };
 
@@ -37,14 +36,14 @@ const Navbar = () => {
         >
           {t('traderVoteApp')}
         </Typography>
+        <Button color="inherit" component={Link} to="/leaderboard">
+          {t('leaderboard', 'Leaderboard')}
+        </Button>
+        <Switch checked={mode === 'dark'} onChange={toggleMode} color="default" />
         <IconButton color="inherit" onClick={handleLangMenu}>
           <Typography variant="body2">{i18n.language.toUpperCase()}</Typography>
         </IconButton>
-        <Menu
-          anchorEl={langAnchor}
-          open={Boolean(langAnchor)}
-          onClose={() => setLangAnchor(null)}
-        >
+        <Menu anchorEl={langAnchor} open={Boolean(langAnchor)} onClose={() => setLangAnchor(null)}>
           <MenuItem onClick={() => handleLangChange('en')}>EN</MenuItem>
           <MenuItem onClick={() => handleLangChange('fr')}>FR</MenuItem>
           <MenuItem onClick={() => handleLangChange('ar')}>AR</MenuItem>
@@ -59,14 +58,9 @@ const Navbar = () => {
             </Button>
           </>
         ) : (
-          <>
-            <Button color="inherit" component={Link} to="/login">
-              {t('login')}
-            </Button>
-            <Button color="inherit" component={Link} to="/register">
-              {t('register')}
-            </Button>
-          </>
+          <Button color="inherit" component={Link} to="/login">
+            {t('login')}
+          </Button>
         )}
       </Toolbar>
     </AppBar>

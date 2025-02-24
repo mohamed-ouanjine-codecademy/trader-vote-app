@@ -59,10 +59,12 @@ io.on('connection', (socket) => {
 const traderRoutes = require('./routes/traderRoutes');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const followRoutes = require('./routes/followRoutes');
 
 app.use('/traders', traderRoutes);
 app.use('/auth', authRoutes);
 app.use('/auth/profile', profileRoutes);
+app.use('/users/follow', followRoutes);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

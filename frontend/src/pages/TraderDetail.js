@@ -9,6 +9,10 @@ import {
   Box,
   Card,
   CardMedia,
+  Paper,
+  Button,
+  Fade,
+  Grid,
 } from '@mui/material';
 import VoteForm from '../components/VoteForm';
 import CommentsSection from '../components/CommentsSection';
@@ -34,30 +38,20 @@ const TraderDetail = () => {
     loadTrader();
   }, [id, t]);
 
-  // Set up a single Socket.IO connection when the component mounts
   useEffect(() => {
-    // Connect using the API URL from environment variables
     const socket = io(process.env.REACT_APP_API_URL);
     socketRef.current = socket;
-    
-    // Join room for this trader
     socket.emit('joinRoom', id);
     console.log('Joined room:', id);
 
-    // Listen for comment updates
     socket.on('commentUpdate', (data) => {
       console.log('Received commentUpdate event:', data);
-      if (data.traderId === id) {
-        loadTrader();
-      }
+      if (data.traderId === id) loadTrader();
     });
 
-    // Listen for vote updates
     socket.on('voteUpdate', (data) => {
       console.log('Received voteUpdate event:', data);
-      if (data.traderId === id) {
-        loadTrader();
-      }
+      if (data.traderId === id) loadTrader();
     });
 
     return () => {
@@ -81,65 +75,103 @@ const TraderDetail = () => {
   const legitPct = totalVotes > 0 ? 100 - scammerPct : 0;
 
   return (
-    <Container sx={{ py: 6 }}>
-      <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
-        {trader.name}
-      </Typography>
-      {trader.images && trader.images.length > 0 && (
-        <Box display="flex" justifyContent="center" sx={{ mb: 4 }}>
-          <Card sx={{ maxWidth: 700, borderRadius: 3, boxShadow: 6 }}>
+    <Fade in timeout={600}>
+      <Container sx={{ py: 6 }}>
+        {/* Hero Section */}
+        <Paper
+          elevation={6}
+          sx={{
+            position: 'relative',
+            height: { xs: 250, md: 400 },
+            borderRadius: 3,
+            overflow: 'hidden',
+            mb: 4,
+          }}
+        >
+          {trader.images && trader.images.length > 0 && (
             <CardMedia
               component="img"
               image={trader.images[0]}
               alt={trader.name}
-              sx={{ height: { xs: 250, md: 400 } }}
+              sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
             />
-          </Card>
-        </Box>
-      )}
-      {trader.socialMedia && (
-        <Typography variant="body1" align="center" gutterBottom>
-          {t('socialMedia', { socialMedia: trader.socialMedia })}
-        </Typography>
-      )}
-      <Divider sx={{ my: 3 }} />
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          {t('votes')}
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 1 }}>
-          {`Scammer: ${scammerPct}% | Legit: ${legitPct}%`}
-        </Typography>
-        <Box
-          sx={{
-            height: 10,
-            width: '100%',
-            borderRadius: 5,
-            backgroundColor: '#e0e0e0',
-            display: 'flex',
-            overflow: 'hidden',
-          }}
-        >
+          )}
           <Box
             sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
               height: '100%',
-              width: `${scammerPct}%`,
-              backgroundColor: '#f44336',
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              p: 2,
             }}
-          />
+          >
+            <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+              {trader.name}
+            </Typography>
+            {trader.socialMedia && (
+              <Typography variant="subtitle1" sx={{ mt: 1 }}>
+                {t('socialMedia', { socialMedia: trader.socialMedia })}
+              </Typography>
+            )}
+            <Button variant="contained" color="secondary" sx={{ mt: 2 }}>
+              {t('viewDetails', 'View Details')}
+            </Button>
+          </Box>
+        </Paper>
+
+        {/* Vote Summary Section */}
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
+            {t('votes')}
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 1 }}>
+            {`Scammer: ${scammerPct}% | Legit: ${legitPct}%`}
+          </Typography>
           <Box
             sx={{
-              height: '100%',
-              width: `${legitPct}%`,
-              backgroundColor: '#2196f3',
+              height: 12,
+              width: '100%',
+              borderRadius: 5,
+              backgroundColor: 'grey.300',
+              display: 'flex',
+              overflow: 'hidden',
             }}
-          />
-        </Box>
-      </Box>
-      <VoteForm traderId={trader._id} onVoteSubmitted={loadTrader} />
-      <Divider sx={{ my: 3 }} />
-      <CommentsSection traderId={trader._id} />
-    </Container>
+          >
+            <Box
+              sx={{
+                height: '100%',
+                width: `${scammerPct}%`,
+                backgroundColor: 'error.main',
+              }}
+            />
+            <Box
+              sx={{
+                height: '100%',
+                width: `${legitPct}%`,
+                backgroundColor: 'primary.main',
+              }}
+            />
+          </Box>
+        </Paper>
+
+        {/* Voting Form Section */}
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
+          <VoteForm traderId={trader._id} onVoteSubmitted={loadTrader} />
+        </Paper>
+
+        {/* Comments Section */}
+        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+          <CommentsSection traderId={trader._id} />
+        </Paper>
+      </Container>
+    </Fade>
   );
 };
 

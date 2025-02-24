@@ -1,104 +1,51 @@
 // frontend/src/pages/Login.js
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Divider,
-  SvgIcon
-} from '@mui/material';
-import axios from 'axios';
+import React, { useEffect, useContext } from 'react';
+import { Container, Card, CardContent, Typography, Button, Divider, SvgIcon } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { AuthContext } from '../context/AuthContext';
 
-// Custom Google logo using SvgIcon
 function GoogleIcon(props) {
   return (
     <SvgIcon {...props}>
-      <path d="M21.35 11.1H12v2.8h5.36c-.23 1.24-.92 2.3-1.96 3.01v2.5h3.18c1.86-1.72 2.93-4.26 2.93-7.31 0-.64-.06-1.26-.18-1.87z" fill="#4285F4"/>
-      <path d="M12 22c2.7 0 4.96-.9 6.61-2.43l-3.18-2.5c-.88.6-2.01.96-3.43.96-2.64 0-4.88-1.78-5.68-4.18H3.09v2.63A9.99 9.99 0 0012 22z" fill="#34A853"/>
-      <path d="M6.32 13.09a5.99 5.99 0 010-3.78V6.68H3.09a10.04 10.04 0 000 8.64l3.23-2.23z" fill="#FBBC05"/>
-      <path d="M12 5.48c1.47 0 2.8.51 3.84 1.51l2.88-2.88C16.95 2.13 14.69 1 12 1 7.34 1 3.32 3.45 1.09 6.68l3.23 2.53C5.12 6.27 8.36 5.48 12 5.48z" fill="#EA4335"/>
-      <path d="M1 1h22v22H1z" fill="none"/>
+      <path d="M21.35 11.1H12v2.8h5.36c-.23 1.24-.92 2.3-1.96 3.01v2.5h3.18c1.86-1.72 2.93-4.26 2.93-7.31 0-.64-.06-1.26-.18-1.87z" fill="#4285F4" />
+      <path d="M12 22c2.7 0 4.96-.9 6.61-2.43l-3.18-2.5c-.88.6-2.01.96-3.43.96-2.64 0-4.88-1.78-5.68-4.18H3.09v2.63A9.99 9.99 0 0012 22z" fill="#34A853" />
+      <path d="M6.32 13.09a5.99 5.99 0 010-3.78V6.68H3.09a10.04 10.04 0 000 8.64l3.23-2.23z" fill="#FBBC05" />
+      <path d="M12 5.48c1.47 0 2.8.51 3.84 1.51l2.88-2.88C16.95 2.13 14.69 1 12 1 7.34 1 3.32 3.45 1.09 6.68l3.23 2.53C5.12 6.27 8.36 5.48 12 5.48z" fill="#EA4335" />
+      <path d="M1 1h22v22H1z" fill="none" />
     </SvgIcon>
   );
 }
 
 const Login = () => {
   const { t } = useTranslation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const { setToken } = useContext(AuthContext);
 
-  // If redirected back from Google auth, store token and redirect home
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-    if (token) {
-      localStorage.setItem('token', token);
-      navigate('/');
+    const tokenParam = params.get('token');
+    const redirectUrl = params.get('redirect') || '/';
+    if (tokenParam) {
+      setToken(tokenParam);
+      navigate(redirectUrl);
     }
-  }, [location, navigate]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
-        username,
-        password,
-      });
-      localStorage.setItem('token', res.data.token);
-      navigate('/');
-    } catch (error) {
-      console.error(t('error'), error);
-    }
-  };
+  }, [location, navigate, setToken]);
 
   const handleGoogleSignIn = () => {
-    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google`;
+    const params = new URLSearchParams(location.search);
+    const redirectUrl = params.get('redirect') || '/';
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8, px: 2 }}>
+    <Container maxWidth="sm" sx={{ mt: 8 }}>
       <Card elevation={5} sx={{ borderRadius: 2 }}>
         <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
           <Typography variant="h4" align="center" gutterBottom>
             {t('login')}
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-            <TextField
-              label={t('username')}
-              variant="outlined"
-              fullWidth
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              label={t('password')}
-              type="password"
-              variant="outlined"
-              fullWidth
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              sx={{ mb: 2, py: 1.5 }}
-            >
-              {t('login')}
-            </Button>
-          </Box>
           <Divider sx={{ my: 2 }}>or</Divider>
           <Button
             variant="outlined"

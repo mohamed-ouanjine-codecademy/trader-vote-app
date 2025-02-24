@@ -32,7 +32,19 @@ const resources = {
       myVotes: "My Votes",
       noVotes: "You haven't voted on any trader yet.",
       myComments: "My Comments",
-      noComments: "You haven't posted any comments yet."
+      noComments: "You haven't posted any comments yet.",
+      "pleaseLoginToVote": "Please log in to vote.",
+      "leaderboard": "Leaderboard",
+      "searchTraders": "Search Traders",
+      "sortBy": "Sort By",
+      "sortScammer": "Scammer %",
+      "sortLegit": "Legit %",
+      "sortTotal": "Total Votes",
+      "viewDetails": "View Details",
+      "follow": "Follow",
+      "unfollow": "Unfollow",
+      "reply": "Reply",
+      "submitReply": "Submit Reply",
     }
   },
   fr: {
