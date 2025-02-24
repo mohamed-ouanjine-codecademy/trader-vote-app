@@ -1,5 +1,5 @@
 // frontend/src/components/Navbar.js
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Switch } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ const Navbar = ({ toggleMode, mode }) => {
   const { t, i18n } = useTranslation();
   const { token, setToken } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [langAnchor, setLangAnchor] = React.useState(null);
+  const [langAnchor, setLangAnchor] = useState(null);
 
   const handleLogout = () => {
     setToken(null);
@@ -28,16 +28,11 @@ const Navbar = ({ toggleMode, mode }) => {
   return (
     <AppBar position="static" sx={{ background: 'linear-gradient(90deg, #0D47A1, #1976D2)' }}>
       <Toolbar>
-        <Typography
-          variant="h6"
-          component={Link}
-          to="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}
-        >
+        <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>
           {t('traderVoteApp')}
         </Typography>
         <Button color="inherit" component={Link} to="/leaderboard">
-          {t('leaderboard', 'Leaderboard')}
+          {t('leaderboard')}
         </Button>
         <Switch checked={mode === 'dark'} onChange={toggleMode} color="default" />
         <IconButton color="inherit" onClick={handleLangMenu}>

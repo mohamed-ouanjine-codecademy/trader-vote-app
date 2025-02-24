@@ -2,7 +2,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import './i18n'; // i18n configuration
+import './i18n';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { getTheme } from './theme';
 import { AuthProvider } from './context/AuthContext';

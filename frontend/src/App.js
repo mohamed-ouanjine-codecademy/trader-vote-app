@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TraderList from './pages/TraderList';
 import TraderDetail from './pages/TraderDetail';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import Navbar from './components/Navbar';
-import { getTheme } from './theme';
 import { useTranslation } from 'react-i18next';
+import { getTheme } from './theme';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 
 function App() {
   const { i18n } = useTranslation();
@@ -27,17 +28,20 @@ function App() {
   };
 
   return (
-    <Router>
-      <Navbar toggleMode={toggleMode} mode={mode} />
-      <Routes>
-        <Route path="/" element={<TraderList />} />
-        <Route path="/trader/:id" element={<TraderDetail />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/leaderboard" element={<Leaderboard />} />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Navbar toggleMode={toggleMode} mode={mode} />
+        <Routes>
+          <Route path="/" element={<TraderList />} />
+          <Route path="/trader/:id" element={<TraderDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 

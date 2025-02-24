@@ -45,6 +45,11 @@ const resources = {
       "unfollow": "Unfollow",
       "reply": "Reply",
       "submitReply": "Submit Reply",
+      "upvote": "Upvote",
+      "downvote": "Downvote",
+      "currentName": "Current Name",
+      "newName": "New Name",
+      "updateProfile": "Update Profile",
     }
   },
   fr: {

@@ -2,18 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchTraderById } from '../services/api';
-import {
-  Container,
-  Typography,
-  Divider,
-  Box,
-  Card,
-  CardMedia,
-  Paper,
-  Button,
-  Fade,
-  Grid,
-} from '@mui/material';
+import { Container, Typography, Divider, Box, Card, CardMedia, Paper, Fade } from '@mui/material';
 import VoteForm from '../components/VoteForm';
 import CommentsSection from '../components/CommentsSection';
 import { useTranslation } from 'react-i18next';
@@ -42,18 +31,12 @@ const TraderDetail = () => {
     const socket = io(process.env.REACT_APP_API_URL);
     socketRef.current = socket;
     socket.emit('joinRoom', id);
-    console.log('Joined room:', id);
-
     socket.on('commentUpdate', (data) => {
-      console.log('Received commentUpdate event:', data);
       if (data.traderId === id) loadTrader();
     });
-
     socket.on('voteUpdate', (data) => {
-      console.log('Received voteUpdate event:', data);
       if (data.traderId === id) loadTrader();
     });
-
     return () => {
       socket.disconnect();
     };
@@ -78,40 +61,11 @@ const TraderDetail = () => {
     <Fade in timeout={600}>
       <Container sx={{ py: 6 }}>
         {/* Hero Section */}
-        <Paper
-          elevation={6}
-          sx={{
-            position: 'relative',
-            height: { xs: 250, md: 400 },
-            borderRadius: 3,
-            overflow: 'hidden',
-            mb: 4,
-          }}
-        >
+        <Paper elevation={6} sx={{ position: 'relative', height: { xs: 250, md: 400 }, borderRadius: 3, overflow: 'hidden', mb: 4 }}>
           {trader.images && trader.images.length > 0 && (
-            <CardMedia
-              component="img"
-              image={trader.images[0]}
-              alt={trader.name}
-              sx={{ height: '100%', width: '100%', objectFit: 'cover' }}
-            />
+            <CardMedia component="img" image={trader.images[0]} alt={trader.name} sx={{ height: '100%', width: '100%', objectFit: 'cover' }} />
           )}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: 'white',
-              p: 2,
-            }}
-          >
+          <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: 'white', p: 2 }}>
             <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
               {trader.name}
             </Typography>
@@ -120,9 +74,6 @@ const TraderDetail = () => {
                 {t('socialMedia', { socialMedia: trader.socialMedia })}
               </Typography>
             )}
-            <Button variant="contained" color="secondary" sx={{ mt: 2 }}>
-              {t('viewDetails', 'View Details')}
-            </Button>
           </Box>
         </Paper>
 
@@ -134,30 +85,9 @@ const TraderDetail = () => {
           <Typography variant="body1" sx={{ mb: 1 }}>
             {`Scammer: ${scammerPct}% | Legit: ${legitPct}%`}
           </Typography>
-          <Box
-            sx={{
-              height: 12,
-              width: '100%',
-              borderRadius: 5,
-              backgroundColor: 'grey.300',
-              display: 'flex',
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              sx={{
-                height: '100%',
-                width: `${scammerPct}%`,
-                backgroundColor: 'error.main',
-              }}
-            />
-            <Box
-              sx={{
-                height: '100%',
-                width: `${legitPct}%`,
-                backgroundColor: 'primary.main',
-              }}
-            />
+          <Box sx={{ height: 12, width: '100%', borderRadius: 5, backgroundColor: 'grey.300', display: 'flex', overflow: 'hidden' }}>
+            <Box sx={{ height: '100%', width: `${scammerPct}%`, backgroundColor: 'error.main' }} />
+            <Box sx={{ height: '100%', width: `${legitPct}%`, backgroundColor: 'primary.main' }} />
           </Box>
         </Paper>
 
