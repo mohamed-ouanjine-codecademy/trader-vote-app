@@ -1,6 +1,6 @@
 // frontend/src/components/VoteForm.js
 import React, { useState } from 'react';
-import { Box, Button, RadioGroup, FormControlLabel, Radio, Typography, Paper } from '@mui/material';
+import { Box, Button, RadioGroup, FormControlLabel, Radio, Typography, Paper, Tooltip } from '@mui/material';
 import { submitVote } from '../services/api';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ const VoteForm = ({ traderId, onVoteSubmitted }) => {
     }
     try {
       await submitVote(traderId, formData);
-      onVoteSubmitted(); // refresh trader details
+      onVoteSubmitted(); // Refresh trader details after vote submission
     } catch (error) {
       console.error(t('error'), error);
     }
@@ -64,9 +64,25 @@ const VoteForm = ({ traderId, onVoteSubmitted }) => {
           <FormControlLabel value="legit" control={<Radio />} label={t("legit")} />
         </RadioGroup>
         <Box sx={{ mb: 2 }}>
-          <input type="file" multiple onChange={handleFileChange} style={{ width: "100%" }} />
+          <Typography variant="subtitle1" sx={{ mb: 1 }}>
+            {t("evidenceLabel", "Evidence (Optional)")}
+          </Typography>
+          <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+            {t("evidenceHelp", "Attach images or screenshots to support your vote.")}
+          </Typography>
+          <Tooltip title={t("evidenceTooltip", "You can upload multiple files as evidence")} arrow>
+            <Button variant="outlined" component="label">
+              {t("uploadEvidence", "Upload Evidence")}
+              <input type="file" hidden multiple onChange={handleFileChange} />
+            </Button>
+          </Tooltip>
+          {evidenceFiles.length > 0 && (
+            <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+              {t("filesSelected", "{{count}} file(s) selected", { count: evidenceFiles.length })}
+            </Typography>
+          )}
         </Box>
-        <Button variant="contained" type="submit" fullWidth sx={{ py: 1.5 }}>
+        <Button variant="contained" type="submit" fullWidth sx={{ mt: 2, py: 1.5 }}>
           {t("submitVote")}
         </Button>
       </Box>

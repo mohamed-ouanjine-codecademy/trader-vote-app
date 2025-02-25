@@ -2,7 +2,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchTraderById } from '../services/api';
-import { Container, Typography, Divider, Box, Card, CardMedia, Paper, Fade } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Divider,
+  Box,
+  Paper,
+  CardMedia,
+  Fade,
+  Button
+} from '@mui/material';
 import VoteForm from '../components/VoteForm';
 import CommentsSection from '../components/CommentsSection';
 import { useTranslation } from 'react-i18next';
@@ -59,14 +68,42 @@ const TraderDetail = () => {
 
   return (
     <Fade in timeout={600}>
-      <Container sx={{ py: 6 }}>
+      <Container sx={{ py: 6, maxWidth: { xs: '95%', md: '80%' } }}>
         {/* Hero Section */}
-        <Paper elevation={6} sx={{ position: 'relative', height: { xs: 250, md: 400 }, borderRadius: 3, overflow: 'hidden', mb: 4 }}>
+        <Paper
+          elevation={8}
+          sx={{
+            position: 'relative',
+            height: { xs: 250, md: 400 },
+            borderRadius: 3,
+            overflow: 'hidden',
+            mb: 4,
+          }}
+        >
           {trader.images && trader.images.length > 0 && (
-            <CardMedia component="img" image={trader.images[0]} alt={trader.name} sx={{ height: '100%', width: '100%', objectFit: 'cover' }} />
+            <CardMedia
+              component="img"
+              image={trader.images[0]}
+              alt={trader.name}
+              sx={{ height: '100%', width: '100%', objectFit: 'cover', filter: 'brightness(0.75)' }}
+            />
           )}
-          <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8))', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', color: 'white', p: 2 }}>
-            <Typography variant="h3" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              color: 'white',
+              px: 2,
+            }}
+          >
+            <Typography variant="h3" sx={{ fontWeight: 700, textAlign: 'center' }}>
               {trader.name}
             </Typography>
             {trader.socialMedia && (
@@ -74,30 +111,56 @@ const TraderDetail = () => {
                 {t('socialMedia', { socialMedia: trader.socialMedia })}
               </Typography>
             )}
+            <Button variant="contained" color="secondary" sx={{ mt: 2 }}>
+              {t('viewDetails', 'View Details')}
+            </Button>
           </Box>
         </Paper>
 
         {/* Vote Summary Section */}
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
+        <Paper elevation={4} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
           <Typography variant="h5" gutterBottom>
             {t('votes')}
           </Typography>
           <Typography variant="body1" sx={{ mb: 1 }}>
             {`Scammer: ${scammerPct}% | Legit: ${legitPct}%`}
           </Typography>
-          <Box sx={{ height: 12, width: '100%', borderRadius: 5, backgroundColor: 'grey.300', display: 'flex', overflow: 'hidden' }}>
-            <Box sx={{ height: '100%', width: `${scammerPct}%`, backgroundColor: 'error.main' }} />
-            <Box sx={{ height: '100%', width: `${legitPct}%`, backgroundColor: 'primary.main' }} />
+          <Box
+            sx={{
+              height: 14,
+              width: '100%',
+              borderRadius: 5,
+              backgroundColor: 'grey.300',
+              display: 'flex',
+              overflow: 'hidden',
+            }}
+          >
+            <Box
+              sx={{
+                height: '100%',
+                width: `${scammerPct}%`,
+                backgroundColor: 'error.main',
+                transition: 'width 0.5s',
+              }}
+            />
+            <Box
+              sx={{
+                height: '100%',
+                width: `${legitPct}%`,
+                backgroundColor: 'primary.main',
+                transition: 'width 0.5s',
+              }}
+            />
           </Box>
         </Paper>
 
-        {/* Voting Form Section */}
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
+        {/* Vote Form Section */}
+        <Paper elevation={4} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
           <VoteForm traderId={trader._id} onVoteSubmitted={loadTrader} />
         </Paper>
 
         {/* Comments Section */}
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+        <Paper elevation={4} sx={{ p: 3, borderRadius: 2 }}>
           <CommentsSection traderId={trader._id} />
         </Paper>
       </Container>

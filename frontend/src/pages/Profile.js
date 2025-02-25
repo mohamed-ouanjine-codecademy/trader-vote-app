@@ -1,6 +1,19 @@
 // frontend/src/pages/Profile.js
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Typography, Box, List, ListItem, ListItemText, Card, CardContent, TextField, Button, Paper } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Avatar,
+  Grid,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Fade,
+} from '@mui/material';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
@@ -9,8 +22,8 @@ const Profile = () => {
   const { t } = useTranslation();
   const { token } = useContext(AuthContext);
   const [profileData, setProfileData] = useState(null);
-  const [error, setError] = useState('');
   const [newName, setNewName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
     try {
@@ -18,11 +31,11 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfileData(res.data);
-      // Set the newName to the current display name, if available.
       setNewName(res.data.user.displayName || res.data.user.username || '');
-    } catch (err) {
-      console.error(t('error'), err);
-      setError(err.response?.data?.error || err.message);
+      setLoading(false);
+    } catch (error) {
+      console.error(t('error'), error);
+      setLoading(false);
     }
   };
 
@@ -39,18 +52,18 @@ const Profile = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setProfileData({ ...profileData, user: res.data.user });
-      alert("Profile updated successfully!");
-    } catch (err) {
-      console.error(err);
-      alert("Error updating profile.");
+      alert(t('profileUpdated', 'Profile updated successfully!'));
+    } catch (error) {
+      console.error(error);
+      alert(t('profileUpdateError', 'Error updating profile.'));
     }
   };
 
-  if (error) {
+  if (loading) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Typography variant="h6" align="center" color="error">
-          {error}
+      <Container sx={{ py: 6 }}>
+        <Typography variant="h6" align="center">
+          {t('loading')}
         </Typography>
       </Container>
     );
@@ -58,9 +71,9 @@ const Profile = () => {
 
   if (!profileData) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Typography variant="h6" align="center">
-          {t('loading')}
+      <Container sx={{ py: 6 }}>
+        <Typography variant="h6" align="center" color="error">
+          {t('profileError', 'Error loading profile')}
         </Typography>
       </Container>
     );
@@ -69,73 +82,127 @@ const Profile = () => {
   const { user, votes, comments } = profileData;
 
   return (
-    <Container sx={{ py: 6 }}>
-      <Typography variant="h3" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
-        {t('profile')}
-      </Typography>
-      
-      {/* Update Name Section */}
-      <Paper sx={{ mb: 4, p: 3, borderRadius: 3, boxShadow: 6 }}>
-        <Typography variant="h6">
-          {t('currentName')}: {user.displayName || user.username}
-        </Typography>
-        <Box component="form" onSubmit={handleUpdate} sx={{ mt: 2 }}>
-          <TextField 
-            label={t('newName', 'New Name')}
-            variant="outlined"
-            fullWidth 
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            required
-          />
-          <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+    <Fade in timeout={600}>
+      <Container sx={{ py: 6, maxWidth: { xs: '95%', md: '80%' } }}>
+        {/* Profile Header */}
+        <Paper
+          elevation={6}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            mb: 4,
+            backgroundColor: 'primary.main',
+            color: 'white',
+          }}
+        >
+          <Grid container spacing={2} alignItems="center">
+            <Grid item>
+              <Avatar
+                sx={{
+                  width: 80,
+                  height: 80,
+                  bgcolor: 'secondary.main',
+                  fontSize: 32,
+                }}
+              >
+                {user.displayName
+                  ? user.displayName.charAt(0).toUpperCase()
+                  : user.username
+                  ? user.username.charAt(0).toUpperCase()
+                  : 'U'}
+              </Avatar>
+            </Grid>
+            <Grid item xs>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                {user.displayName || user.username}
+              </Typography>
+              <Typography variant="subtitle1">
+                {t('welcome', 'Welcome to your profile')}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Paper>
+
+        {/* Profile Update Section */}
+        <Paper elevation={4} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
+          <Typography variant="h5" gutterBottom>
             {t('updateProfile', 'Update Profile')}
-          </Button>
-        </Box>
-      </Paper>
-      
-      {/* Votes Section */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          {t('myVotes')}
-        </Typography>
-        {votes.length === 0 ? (
-          <Typography variant="body1">{t('noVotes')}</Typography>
-        ) : (
-          <List>
-            {votes.map(vote => (
-              <ListItem key={vote._id}>
-                <ListItemText 
-                  primary={`${vote.trader.name}: ${vote.vote}`} 
-                  secondary={new Date(vote.createdAt).toLocaleString()} 
-                />
-              </ListItem>
-            ))}
-          </List>
-        )}
-      </Box>
-      
-      {/* Comments Section */}
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          {t('myComments')}
-        </Typography>
-        {comments.length === 0 ? (
-          <Typography variant="body1">{t('noComments')}</Typography>
-        ) : (
-          <List>
-            {comments.map(comment => (
-              <ListItem key={comment._id}>
-                <ListItemText 
-                  primary={`${comment.trader ? comment.trader.name : 'Unknown Trader'}: ${comment.text}`} 
-                  secondary={new Date(comment.createdAt).toLocaleString()} 
-                />
-              </ListItem>
-            ))}
-          </List>
-        )}
-      </Box>
-    </Container>
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleUpdate}
+            sx={{
+              mt: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+            }}
+          >
+            <TextField
+              label={t('newName', 'New Name')}
+              variant="outlined"
+              fullWidth
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              required
+            />
+            <Button type="submit" variant="contained">
+              {t('saveChanges', 'Save Changes')}
+            </Button>
+          </Box>
+        </Paper>
+
+        {/* Recent Activity Section */}
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={4} sx={{ p: 3, borderRadius: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                {t('myVotes', 'My Votes')}
+              </Typography>
+              {votes.length === 0 ? (
+                <Typography variant="body1">
+                  {t('noVotes', "You haven't voted on any trader yet.")}
+                </Typography>
+              ) : (
+                <List>
+                  {votes.map((vote) => (
+                    <ListItem key={vote._id}>
+                      <ListItemText
+                        primary={`${vote.trader.name}: ${vote.vote}`}
+                        secondary={new Date(vote.createdAt).toLocaleString()}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={4} sx={{ p: 3, borderRadius: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                {t('myComments', 'My Comments')}
+              </Typography>
+              {comments.length === 0 ? (
+                <Typography variant="body1">
+                  {t('noComments', "You haven't posted any comments yet.")}
+                </Typography>
+              ) : (
+                <List>
+                  {comments.map((comment) => (
+                    <ListItem key={comment._id}>
+                      <ListItemText
+                        primary={`${comment.trader ? comment.trader.name : 'Unknown Trader'}: ${comment.text}`}
+                        secondary={new Date(comment.createdAt).toLocaleString()}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </Fade>
   );
 };
 

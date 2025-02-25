@@ -50,6 +50,18 @@ const resources = {
       "currentName": "Current Name",
       "newName": "New Name",
       "updateProfile": "Update Profile",
+      "discoverTopTraders": "Discover and evaluate traders based on community feedback.",
+      "welcome": "Welcome to your profile",
+      "saveChanges": "Save Changes",
+      "profileError": "Error loading profile",
+      "profileUpdated": "Profile updated successfully!",
+      "profileUpdateError": "Error updating profile",
+      "noNotifications": "No notifications",
+      "evidenceLabel": "Evidence (Optional)",
+      "evidenceHelp": "Attach images or screenshots to support your vote.",
+      "evidenceTooltip": "You can upload multiple files as evidence",
+      "uploadEvidence": "Upload Evidence",
+      "filesSelected": "{{count}} file(s) selected"
     }
   },
   fr: {

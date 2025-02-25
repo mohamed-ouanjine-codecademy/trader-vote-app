@@ -1,3 +1,4 @@
+// frontend/src/components/CommentItem.js
 import React, { useState } from 'react';
 import { Box, Paper, Typography, IconButton, Collapse, TextField, Button, Avatar, Grow } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -45,6 +46,7 @@ const CommentItem = ({ comment, traderId, refreshComments, level = 0 }) => {
     }
   };
 
+  // Calculate score based on the length of vote arrays (if present)
   const upvotes = comment.upvotedBy ? comment.upvotedBy.length : 0;
   const downvotes = comment.downvotedBy ? comment.downvotedBy.length : 0;
   const score = upvotes - downvotes;
@@ -52,18 +54,7 @@ const CommentItem = ({ comment, traderId, refreshComments, level = 0 }) => {
   return (
     <Grow in timeout={600}>
       <Box sx={{ ml: level * 4, mt: 2, borderLeft: level > 0 ? '2px solid #ccc' : 'none', pl: level > 0 ? 2 : 0 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            borderRadius: 2,
-            backgroundColor: 'background.paper',
-            position: 'relative',
-            overflow: 'visible',
-            transition: 'transform 0.3s',
-            '&:hover': { transform: 'scale(1.02)' },
-          }}
-        >
+        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, backgroundColor: 'background.paper', transition: 'transform 0.3s', '&:hover': { transform: 'scale(1.02)' } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <Avatar sx={{ mr: 1, bgcolor: 'primary.main', width: 32, height: 32 }}>
               {comment.name ? comment.name.charAt(0).toUpperCase() : 'A'}
@@ -119,9 +110,11 @@ const CommentItem = ({ comment, traderId, refreshComments, level = 0 }) => {
             </Box>
           </Collapse>
         </Paper>
-        {comment.replies && comment.replies.length > 0 && comment.replies.map((reply) => (
-          <CommentItem key={reply._id} comment={reply} traderId={traderId} refreshComments={refreshComments} level={level + 1} />
-        ))}
+        {comment.replies && comment.replies.length > 0 &&
+          comment.replies.map((reply) => (
+            <CommentItem key={reply._id} comment={reply} traderId={traderId} refreshComments={refreshComments} level={level + 1} />
+          ))
+        }
       </Box>
     </Grow>
   );

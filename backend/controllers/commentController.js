@@ -1,39 +1,54 @@
 // backend/controllers/commentController.js
 const Comment = require('../models/Comment');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 exports.postComment = async (req, res) => {
   try {
-    const { text, name } = req.body;
+    const { text, parentComment } = req.body;
     if (!text) {
       return res.status(400).json({ error: "Comment text is required" });
     }
 
-    let commentName = name || "Anonymous";
-
-    // If the user is authenticated, override the name with the user's display name or username
-    if (req.user && req.user.userId) {
-      const user = await User.findById(req.user.userId);
-      if (user) {
-        commentName = user.displayName || user.username || commentName;
-      }
+    // Ensure the user is authenticated
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ error: "Authentication required to post a comment." });
     }
 
+    // Fetch the current user from the database
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Always override the comment name with the current user's name
     const commentData = {
       trader: req.params.id,
       text,
-      name: commentName,
-      parentComment: req.body.parentComment || null,
+      name: user.displayName || user.username || "Anonymous",
+      user: req.user.userId,
+      parentComment: parentComment || null,
     };
-
-    if (req.user) {
-      commentData.user = req.user.userId;
-    }
 
     const newComment = new Comment(commentData);
     await newComment.save();
 
-    // Emit a real-time update event to the trader's room
+    // If this comment is a reply, notify the parent comment's owner (if different)
+    if (parentComment) {
+      const parent = await Comment.findById(parentComment);
+      if (parent && parent.user && parent.user.toString() !== req.user.userId) {
+        const notification = new Notification({
+          user: parent.user,
+          type: 'reply',
+          message: `${user.displayName || user.username} replied to your comment.`,
+        });
+        await notification.save();
+        const io = req.app.get('io');
+        io.to(parent.user.toString()).emit('notification', notification);
+      }
+    }
+
+    // Emit a real-time update event to all clients viewing this trader
     const io = req.app.get('io');
     io.to(req.params.id.toString()).emit('commentUpdate', { traderId: req.params.id });
 
@@ -45,11 +60,21 @@ exports.postComment = async (req, res) => {
 
 exports.getComments = async (req, res) => {
   try {
-    const comments = await Comment.find({ trader: req.params.id })
+    // Retrieve comments and populate the user field (getting displayName and username)
+    let comments = await Comment.find({ trader: req.params.id })
       .sort({ createdAt: -1 })
       .populate('user', 'displayName username')
       .lean();
-    // Build a nested tree from the flat list:
+
+    // Override the name of each comment with the current user data (if available)
+    comments = comments.map(comment => {
+      if (comment.user) {
+        comment.name = comment.user.displayName || comment.user.username || comment.name;
+      }
+      return comment;
+    });
+
+    // Build the nested (threaded) comment tree
     const commentMap = {};
     comments.forEach(comment => {
       comment.replies = [];
@@ -66,6 +91,7 @@ exports.getComments = async (req, res) => {
         threadedComments.push(comment);
       }
     });
+
     res.json(threadedComments);
   } catch (error) {
     res.status(500).json({ error: error.message });
